@@ -217,7 +217,7 @@
 
             getDot() {
                 let local = this;
-                firebase.firestore().collection('dots').where('id', '==', 1).get()
+               dots.where('id', '==', 1).get()
                     .then((querySnapshot) => {
                         querySnapshot.forEach((doc) => {
                             local.dot = doc.data();
@@ -231,21 +231,20 @@
         },
 
 
-        // created() {
-        //     let local = this;
-
-        //     firebase.firestore().collection('dots').where('id', '==', 1)
-        //         .onSnapshot(function (snapshot) {
-        //             snapshot.docChanges().forEach(function (change) {
-        //                 if (change.type === "added") {
-        //                     local.dot = change.doc.data();
-        //                 }
-        //                 if (change.type === "modified") {
-        //                     local.dot = change.doc.data();
-        //                 }
-        //             });
-        //         });
-        // }
+        created() {
+            let local = this;
+            dots.where('id', '==', 1)
+                .onSnapshot(function (snapshot) {
+                    snapshot.docChanges().forEach(function (change) {
+                        if (change.type === "added") {
+                            local.dot = change.doc.data();
+                        }
+                        if (change.type === "modified") {
+                            local.dot = change.doc.data();
+                        }
+                    });
+                });
+        }
 
     })
 </script>
