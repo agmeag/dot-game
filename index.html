@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Template</title>
+    <link rel="stylesheet" href="assets/css/misc.css">
+    <link rel="stylesheet" href="assets/css/flex.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <link rel="stylesheet" href="assets/css/vuetify.min.css">
+    <link rel="stylesheet" href="assets/css/materialdesignicons.min.css">
+    <script src="assets/js/vue.js"></script>
+    <script src="assets/js/vuetify.js"></script>
+    <script src="assets/js/sweetalert2.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/component/includeHtml.js"></script>
+    <script src="assets/js/copyClipboard.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            background-color: rgb(41, 45, 51);
+            overflow: hidden;
+        }
+
+        .dot {
+            background-color: white;
+            width: 10px;
+            height: 10px;
+            position: fixed;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <div class="dot" v-bind:style="{top: `${dot.y}`+'px',left: `${dot.x}`+'px'}">
+
+        </div>
+        <input v-on:keydown="keyEvent($event)" type="text">
+
+        <!-- <input v-on:keyup.up="up()">
+        <input v-on:keyup.down="down()">
+        <input v-on:keyup.left="left()">
+        <input v-on:keyup.right="right()"> -->
+
+        <!-- <div v-on:click="up">
+            up
+        </div>
+        <div v-on:click="down">
+            down
+        </div>
+        <div v-on:click="left">
+            left
+        </div>
+        <div v-on:click="right">
+            right
+        </div> -->
+
+
+    </div>
+</body>
+
+<script src="assets/js/axios.min.js"></script>
+<script src="assets/component/component.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script> -->
+
+
+<script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-database.js"></script>
+<script type="module">
+    // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
+    // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js";
+    // import { getDatabase } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyA1rEzfixdhghpeUiMqmdNioMuV9BTcvKo",
+        authDomain: "dot-game-98a2b.firebaseapp.com",
+        databaseURL: "https://dot-game-98a2b-default-rtdb.firebaseio.com",
+        projectId: "dot-game-98a2b",
+        storageBucket: "dot-game-98a2b.appspot.com",
+        messagingSenderId: "38443253056",
+        appId: "1:38443253056:web:1c319d799a5aa49b0c4ea5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const dots = firebase.firestore().collection('dots');
+    console.log(dots);
+    axios.defaults.headers.common = {
+        "X-Requested-With": "XMLHttpRequest",
+        "Access-Control-Allow-Origin": "*",
+    };
+
+    new Vue({
+        el: '#app',
+        vuetify: new Vuetify({
+        }),
+        data() {
+            return {
+                variable: null,
+                dot_id: null,
+                dot: {
+                    id: null,
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                },
+            }
+        },
+        beforeMount() {
+            this.getDot();
+        },
+        computed: {},
+        watch: {
+            // positionx: function (newvalue, oldvalue) {
+            //     if (newvalue && newvalue != oldvalue) {
+            //         this.writeDotData(1, 1, 1);
+            //     }
+            // },
+            // positiony: function (newvalue, oldvalue) {
+            //     if (newvalue && newvalue != oldvalue) {
+            //         this.writeDotData(1, 1, 1);
+            //     }
+            // },
+        },
+        methods: {
+
+            keyEvent(event) {
+                console.log('Key pressed:', event.key);
+                switch (event.key) {
+                    case "ArrowDown":
+                        this.down();
+                        break;
+                    case "ArrowUp":
+                        this.up();
+                        break;
+                    case "ArrowLeft":
+                        this.left();
+                        break;
+                    case "ArrowRight":
+                        this.right();
+                        break;
+                }
+            },
+
+
+            // store() {
+            //     dots.add({
+            //         id: this.user_id,
+            //         x: this.positionx,
+            //         y: this.positiony,
+            //     })
+            //         .then(function (docRef) {
+            //             console.log("Document written with ID: ", docRef.id);
+            //             // dots.doc(docRef.id).update
+            //             //     ({
+            //             //         session_id: docRef.id,
+            //             //     });
+            //             // location.replace(`/one2one_hosted/` + docRef.id);
+            //         })
+            //         .catch(function (error) {
+            //             console.error("Error adding document: ", error);
+            //         });
+            // },
+
+            // writeDotData(id, x, y) {
+            //     // db.ref('dot').set({
+            //     //     id: 1,
+            //     //     x: this.positionx,
+            //     //     y: this.positiony,
+            //     // });
+            //     dots.doc(this.user_id).update({
+            //         x: this.positionx,
+            //         y: this.positiony,
+            //     });
+            // },
+
+            // readDotData() {
+            //     db.on('value', (snapshot) => {
+            //         this.positionx = snapshot.ref('x').val();
+            //         this.positiony = snapshot.ref('y').val();
+            //     });
+            // },
+
+
+            updatePosition() {
+                dots.doc(this.dot_id).update({
+                    x: this.dot.x,
+                    y: this.dot.y,
+                });
+            },
+
+            up() {
+                this.dot.y--;
+                this.updatePosition();
+            },
+
+            down() {
+                this.dot.y++;
+                this.updatePosition();
+            },
+
+            left() {
+                this.dot.x--;
+                this.updatePosition();
+            },
+
+            right() {
+                this.dot.x++;
+                this.updatePosition();
+            },
+
+            getDot() {
+                let local = this;
+                firebase.firestore().collection('dots').where('id', '==', 1).get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            local.dot = doc.data();
+                            local.dot_id = doc.id;
+                        });
+                    })
+                    .catch((error) => {
+                        console.log("Error getting documents: ", error);
+                    });
+            }
+        },
+
+
+        // created() {
+        //     let local = this;
+
+        //     firebase.firestore().collection('dots').where('id', '==', 1)
+        //         .onSnapshot(function (snapshot) {
+        //             snapshot.docChanges().forEach(function (change) {
+        //                 if (change.type === "added") {
+        //                     local.dot = change.doc.data();
+        //                 }
+        //                 if (change.type === "modified") {
+        //                     local.dot = change.doc.data();
+        //                 }
+        //             });
+        //         });
+        // }
+
+    })
+</script>
+
+</html>
