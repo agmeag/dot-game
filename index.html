@@ -91,6 +91,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const dots = firebase.firestore().collection('dots');
+    const step = 20;
     console.log(dots);
     axios.defaults.headers.common = {
         "X-Requested-With": "XMLHttpRequest",
@@ -196,22 +197,22 @@
             },
 
             up() {
-                this.dot.y--;
+                this.dot.y-=step;
                 this.updatePosition();
             },
 
             down() {
-                this.dot.y++;
+                this.dot.y+=step;
                 this.updatePosition();
             },
 
             left() {
-                this.dot.x--;
+                this.dot.x-=step;
                 this.updatePosition();
             },
 
             right() {
-                this.dot.x++;
+                this.dot.x+=step;
                 this.updatePosition();
             },
 
