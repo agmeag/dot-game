@@ -33,6 +33,30 @@
             position: fixed;
 
         }
+
+        .arrows-cnt {
+            width: 170px;
+            height: 150px;
+            position: fixed;
+            box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+            background-color: white;
+            border-radius: 12px;
+        }
+
+        .arrow {
+            color: #df2029a4 !important;
+        }
+
+        .float-bottom {
+            position: fixed;
+            bottom: 30px;
+            text-align: center;
+            width: 100%;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+
+        }
     </style>
 </head>
 
@@ -60,8 +84,25 @@
         <div v-on:click="right">
             right
         </div> -->
+        <div class="float-bottom">
+            <div class="m-flex m-justify-center m-align-center m-flex-v arrows-cnt">
+                <v-icon class="arrow" style="font-size: 50px;" v-on:click="up">
+                    mdi-arrow-up-bold-circle
+                </v-icon>
+                <div class="m-flex m-justify-center w-100 m-space-around">
+                    <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="left">
+                        mdi-arrow-left-bold-circle
+                    </v-icon>
+                    <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="right">
+                        mdi-arrow-right-bold-circle
+                    </v-icon>
 
-
+                </div>
+                <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="down">
+                    mdi-arrow-down-bold-circle
+                </v-icon>
+            </div>
+        </div>
     </div>
 </body>
 
@@ -197,28 +238,28 @@
             },
 
             up() {
-                this.dot.y-=step;
+                this.dot.y -= step;
                 this.updatePosition();
             },
 
             down() {
-                this.dot.y+=step;
+                this.dot.y += step;
                 this.updatePosition();
             },
 
             left() {
-                this.dot.x-=step;
+                this.dot.x -= step;
                 this.updatePosition();
             },
 
             right() {
-                this.dot.x+=step;
+                this.dot.x += step;
                 this.updatePosition();
             },
 
             getDot() {
                 let local = this;
-               dots.where('id', '==', 1).get()
+                dots.where('id', '==', 1).get()
                     .then((querySnapshot) => {
                         querySnapshot.forEach((doc) => {
                             local.dot = doc.data();
