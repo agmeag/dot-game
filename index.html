@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="assets/css/materialdesignicons.min.css">
     <script src="assets/js/vue.js"></script>
     <script src="assets/js/vuetify.js"></script>
+    <script src="assets/js/fontawesome.all.min.js"></script>
     <script src="assets/js/sweetalert2.all.min.js"></script>
     <script src="assets/js/jquery.min.js"></script>
     <!-- <script src="assets/component/includeHtml.js"></script> -->
@@ -36,7 +37,6 @@
 
         .arrows-cnt {
             width: 170px;
-            height: 150px;
             position: fixed;
             box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
             background-color: white;
@@ -52,54 +52,60 @@
             bottom: 30px;
             text-align: center;
             width: 100%;
-            height: 150px;
+            height: 180px;
             display: flex;
             justify-content: center;
 
+        }
+
+        .reset {
+            color: #25D366 !important;
+        }
+
+        .player {
+            color: white;
+            font-size: 50px;
         }
     </style>
 </head>
 
 <body>
     <div id="app" v-cloak>
-        <div class="dot" v-bind:style="{top: `${dot.y}`+'px',left: `${dot.x}`+'px'}">
+        <div class="float-header" v-if="!selectedPlayer">
+            <div v-on:click="selectPlayer(0)">
+                <i class="fas fa-dice-one player"></i>
+            </div>
+            <div v-on:click="selectPlayer(1)">
+                <i class="fas fa-dice-two player"></i>
+            </div>
 
         </div>
-        <input v-on:keydown="keyEvent($event)" type="text">
+        <template v-for="item in dot" v-if="selectedPlayer">
+            <div class="dot" v-bind:style="{top: `${item.y}`+'px',left: `${item.x}`+'px'}"></div>
+        </template>
+        <!-- <div class="dot" v-bind:style="{top: `${dot[0].y}`+'px',left: `${dot[0].x}`+'px'}"></div>
+        <div class="dot" v-bind:style="{top: `${dot[1].y}`+'px',left: `${dot[1].x}`+'px'}"></div> -->
 
-        <!-- <input v-on:keyup.up="up()">
-        <input v-on:keyup.down="down()">
-        <input v-on:keyup.left="left()">
-        <input v-on:keyup.right="right()"> -->
-
-        <!-- <div v-on:click="up">
-            up
-        </div>
-        <div v-on:click="down">
-            down
-        </div>
-        <div v-on:click="left">
-            left
-        </div>
-        <div v-on:click="right">
-            right
-        </div> -->
+        <input v-on:keydown="keyEvent($event)" type="text" v-if="selectedPlayer">
         <div class="float-bottom">
             <div class="m-flex m-justify-center m-align-center m-flex-v arrows-cnt">
                 <v-icon class="arrow" style="font-size: 50px;" v-on:click="up">
                     mdi-arrow-up-bold-circle
                 </v-icon>
                 <div class="m-flex m-justify-center w-100 m-space-around">
-                    <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="left">
+                    <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="left" @mousedown="left">
                         mdi-arrow-left-bold-circle
                     </v-icon>
-                    <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="right">
+                    <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="right" @mousedown="right">
                         mdi-arrow-right-bold-circle
                     </v-icon>
 
                 </div>
-                <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="down">
+                <v-icon class="arrow" color="black" style="font-size: 50px;" v-on:click="down" @mousedown="down">
                     mdi-arrow-down-bold-circle
+                </v-icon>
+                <v-icon class="arrow reset" color="black" style="font-size: 50px;" v-on:click="reset">
+                    mdi-rotate-left
                 </v-icon>
             </div>
         </div>
@@ -146,34 +152,54 @@
         data() {
             return {
                 variable: null,
-                dot_id: null,
-                dot: {
-                    id: null,
-                    x: window.innerWidth / 2,
-                    y: window.innerHeight / 2,
-                },
+                dot_doc: [
+                    null,
+                    null,
+                ],
+                dot: [
+                    {
+                        id: 0,
+                        x: window.innerWidth / 2,
+                        y: window.innerHeight / 2,
+                    },
+                    {
+                        id: 1,
+                        x: window.innerWidth / 2,
+                        y: window.innerHeight / 2,
+                    }
+                ],
+                selectedPlayer: false,
+                userId: 0,
             }
         },
         beforeMount() {
-            this.getDot();
+            // this.setInstance();
+            this.setInstance();
         },
+
+        mounted() { },
         computed: {},
-        watch: {
-            // positionx: function (newvalue, oldvalue) {
-            //     if (newvalue && newvalue != oldvalue) {
-            //         this.writeDotData(1, 1, 1);
-            //     }
-            // },
-            // positiony: function (newvalue, oldvalue) {
-            //     if (newvalue && newvalue != oldvalue) {
-            //         this.writeDotData(1, 1, 1);
-            //     }
-            // },
-        },
+        watch: {},
         methods: {
+            selectPlayer(player) {
+                this.userId = player;
+                this.reset(player);
+                this.selectedPlayer = true;
+            },
+
+            reset() {
+                this.dot[0].x = 0;
+                this.dot[0].y = 0;
+                this.dot[1].x = 0;
+                this.dot[1].y = 0;
+                this.updatePosition(0);
+                this.updatePosition(1);
+
+            },
+
 
             keyEvent(event) {
-                console.log('Key pressed:', event.key);
+                console.log('Key pressed:', event);
                 switch (event.key) {
                     case "ArrowDown":
                         this.down();
@@ -190,84 +216,83 @@
                 }
             },
 
-
-            // store() {
-            //     dots.add({
-            //         id: this.user_id,
-            //         x: this.positionx,
-            //         y: this.positiony,
-            //     })
-            //         .then(function (docRef) {
-            //             console.log("Document written with ID: ", docRef.id);
-            //             // dots.doc(docRef.id).update
-            //             //     ({
-            //             //         session_id: docRef.id,
-            //             //     });
-            //             // location.replace(`/one2one_hosted/` + docRef.id);
-            //         })
-            //         .catch(function (error) {
-            //             console.error("Error adding document: ", error);
-            //         });
-            // },
-
-            // writeDotData(id, x, y) {
-            //     // db.ref('dot').set({
-            //     //     id: 1,
-            //     //     x: this.positionx,
-            //     //     y: this.positiony,
-            //     // });
-            //     dots.doc(this.user_id).update({
-            //         x: this.positionx,
-            //         y: this.positiony,
-            //     });
-            // },
-
-            // readDotData() {
-            //     db.on('value', (snapshot) => {
-            //         this.positionx = snapshot.ref('x').val();
-            //         this.positiony = snapshot.ref('y').val();
-            //     });
-            // },
-
-
-            updatePosition() {
-                dots.doc(this.dot_id).update({
-                    x: this.dot.x,
-                    y: this.dot.y,
+            updatePosition(user) {
+                dots.doc(this.dot_doc[user]).update({
+                    x: this.dot[user].x,
+                    y: this.dot[user].y,
                 });
             },
 
             up() {
-                this.dot.y -= step;
-                this.updatePosition();
+                // this.dot.y = this.dot.y * this.dot.hostScreen;
+                // let i = this.userId;
+                this.dot[this.userId].y -= step;
+                this.updatePosition(this.userId);
             },
 
             down() {
-                this.dot.y += step;
-                this.updatePosition();
+                this.dot[this.userId].y += step;
+                this.updatePosition(this.userId);
             },
 
             left() {
-                this.dot.x -= step;
-                this.updatePosition();
+                this.dot[this.userId].x -= step;
+                this.updatePosition(this.userId);
             },
 
             right() {
-                this.dot.x += step;
-                this.updatePosition();
+                this.dot[this.userId].x += step;
+                this.updatePosition(this.userId);
             },
 
-            getDot() {
+            // getDot(user) {
+            //     let local = this;
+            //     console.log('llegue 1');
+
+            //     dots.where('id', '==', user).get()
+            //         .then((querySnapshot) => {
+            //             querySnapshot.forEach((doc) => {
+            //                 console.log('llegue 2');
+            //                 local.dot_doc[user] = doc.id;
+            //                 local.dot[user] = doc.data();
+            //                 local.dot[user].x = local.dot[user].x == 0 || local.dot[user].x == null ? window.innerWidth / 2 : local.dot[user].x;
+            //                 local.dot[user].y = local.dot[user].y == 0 || local.dot[user].y == null ? window.innerHeight / 2 : local.dot[user].y;
+            //             });
+            //         })
+            //         .catch((error) => {
+            //             console.log("Error getting documents: ", error);
+            //         });
+            // },
+
+            changeValues(user, change) {
                 let local = this;
-                dots.where('id', '==', 1).get()
-                    .then((querySnapshot) => {
-                        querySnapshot.forEach((doc) => {
-                            local.dot = doc.data();
-                            local.dot_id = doc.id;
+                local.dot[user] = change.doc.data();
+                local.dot_doc[user] = change.doc.id;
+                if (local.dot[user].x == 0 || local.dot[user].x == null) {
+                    local.dot[user].x = window.innerWidth / 2;
+                    // this.updatePosition(this.userId);
+                }
+
+                if (local.dot[user].y == 0 || local.dot[user].y == null) {
+                    local.dot[user].y = window.innerHeight / 2;
+                    // this.updatePosition(this.userId);
+                }
+            },
+
+            setInstance() {
+                let local = this, emptyobject;
+                dots.where('id', 'in', [0, 1])
+                    .onSnapshot(function (snapshot) {
+                        snapshot.docChanges().forEach(function (change) {
+                            emptyobject = change.doc.data();
+                            console.log(emptyobject);
+                            if (change.type === "added") {
+                                emptyobject.id == 0 ? local.changeValues(0, change) : local.changeValues(1, change);
+                            }
+                            if (change.type === "modified") {
+                                emptyobject.id == 0 ? local.changeValues(0, change) : local.changeValues(1, change);
+                            }
                         });
-                    })
-                    .catch((error) => {
-                        console.log("Error getting documents: ", error);
                     });
             }
         },
@@ -275,18 +300,59 @@
 
         created() {
             let local = this;
-            dots.where('id', '==', 1)
+            let i = this.userId;
+            const unsubscribe = dots.where('id', 'in', [0, 1])
                 .onSnapshot(function (snapshot) {
                     snapshot.docChanges().forEach(function (change) {
+                        emptyobject = change.doc.data();
                         if (change.type === "added") {
-                            local.dot = change.doc.data();
+                            emptyobject.id == 0 ? local.changeValues(0, change) : local.changeValues(1, change);
                         }
                         if (change.type === "modified") {
-                            local.dot = change.doc.data();
+                            emptyobject.id == 0 ? local.changeValues(0, change) : local.changeValues(1, change);
                         }
                     });
                 });
+
         }
+
+        // store() {
+        //     dots.add({
+        //         id: this.user_id,
+        //         x: this.positionx,
+        //         y: this.positiony,
+        //     })
+        //         .then(function (docRef) {
+        //             console.log("Document written with ID: ", docRef.id);
+        //             // dots.doc(docRef.id).update
+        //             //     ({
+        //             //         session_id: docRef.id,
+        //             //     });
+        //             // location.replace(`/one2one_hosted/` + docRef.id);
+        //         })
+        //         .catch(function (error) {
+        //             console.error("Error adding document: ", error);
+        //         });
+        // },
+
+        // writeDotData(id, x, y) {
+        //     // db.ref('dot').set({
+        //     //     id: 1,
+        //     //     x: this.positionx,
+        //     //     y: this.positiony,
+        //     // });
+        //     dots.doc(this.user_id).update({
+        //         x: this.positionx,
+        //         y: this.positiony,
+        //     });
+        // },
+
+        // readDotData() {
+        //     db.on('value', (snapshot) => {
+        //         this.positionx = snapshot.ref('x').val();
+        //         this.positiony = snapshot.ref('y').val();
+        //     });
+        // },
 
     })
 </script>
